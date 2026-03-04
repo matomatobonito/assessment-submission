@@ -16,5 +16,24 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AnswerSubmitController extends AbstractController
 {
-    //to do
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        AssessmentAnswer $answer,
+        AssessmentInstance $instance,
+        AssessmentAnswerOption $option,
+        AssessmentQuestion $question,
+    ) 
+    {
+        $this->entityManager = $entityManager;
+        $this->answer = $answer;
+        $this->instance = $instance;
+        $this->option = $option;
+        $this->question = $question;
+    }
+
+    /**
+     * @Route("/api/assessment/answers", methods={"POST"})
+     */
 }
