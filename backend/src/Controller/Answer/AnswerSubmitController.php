@@ -23,14 +23,12 @@ class AnswerSubmitController extends AbstractController
         AssessmentAnswer $answer,
         AssessmentInstance $instance,
         AssessmentAnswerOption $option,
-        AssessmentQuestion $question,
     ) 
     {
         $this->entityManager = $entityManager;
         $this->answer = $answer;
         $this->instance = $instance;
         $this->option = $option;
-        $this->question = $question;
     }
 
     /**
@@ -43,13 +41,41 @@ class AnswerSubmitController extends AbstractController
 
         $instanceId = $data['instance_id'] ?? null;
         $questionId = $data['question_id'] ?? null;
-        $answerOptionId = $data['answer_option_id'] ?? null;
+        $optionId = $data['answer_option_id'] ?? null;
+
+         if (!$instanceId || !$questionId) {
+        return new JsonResponse(
+            ['error' => 'Required fields missing, please check request.'],
+            Response::HTTP_BAD_REQUEST
+          );
+        }
 
         $instance = $entityManager->getRepository(AssessmentInstance::class)
         ->find($instanceId);
 
+        if (!$instance) {
+        return new JsonResponse(
+            ['error' => 'No such instance found in database.'],
+            Response::HTTP_NOT_FOUND
+          );
+        }
+
         $option = $entityManager ->getRepository(AssessmentAnswerOption::class)
         ->find($answerOptionId);
+
+         if (!$option) {
+            return new JsonResponse(
+                ['error' => 'No such option found for this answer.'],
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        if ($option->getAssessmentQuestion()->getId() !== $questionId) {
+            return new JsonResponse(
+                ['error' => 'Answer option does not belong to question'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
 
         $answer = new AssessmentAnswer(
             null,
