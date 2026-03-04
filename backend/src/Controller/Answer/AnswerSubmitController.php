@@ -7,7 +7,6 @@ namespace App\Controller\Answer;
 use App\Domain\AssessmentAnswer;
 use App\Domain\AssessmentInstance;
 use App\Domain\AssessmentAnswerOption;
-use App\Domain\AssessmentQuestion;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -43,7 +42,7 @@ class AnswerSubmitController extends AbstractController
         $questionId = $data['question_id'] ?? null;
         $optionId = $data['answer_option_id'] ?? null;
 
-         if (!$instanceId || !$questionId) {
+         if (!$instanceId || !$questionId || !$option_id) {
         return new JsonResponse(
             ['error' => 'Required fields missing, please check request.'],
             Response::HTTP_BAD_REQUEST
@@ -61,7 +60,7 @@ class AnswerSubmitController extends AbstractController
         }
 
         $option = $entityManager ->getRepository(AssessmentAnswerOption::class)
-        ->find($answerOptionId);
+        ->find($optionId);
 
          if (!$option) {
             return new JsonResponse(
